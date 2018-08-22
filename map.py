@@ -1,4 +1,7 @@
 
+def room_description(room, description):
+    return description
+
 
 class MapTile(object):
 
@@ -8,6 +11,10 @@ class MapTile(object):
     W = None
 
     contents = {}
+
+    def description(self):
+        pass
+
 
     def directions(self):
 
@@ -23,66 +30,121 @@ class MapTile(object):
 
 
 class EntranceRoom(MapTile):
+    name = 'Entrance Room'
+
     N = "lobby_room"
     S = ""
     E = ""
     W = ""
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class LobbyRoom(MapTile):
+    name = 'Lobby Room'
+
     N = "veg_room"
     S = "entrance_room"
     E = "bar_room"
     W = "green_room"
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class BarRoom(MapTile):
+    name = 'Bar Room'
+
     N = "clone_room"
     S = "skate_room"
     E = ""
     W = "lobby_room"
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class GreenRoom(MapTile):
+    name = 'Green Room'
+
     N = "flower_room"
     S = "boys_room"
     E = "lobby_room"
     W = ""
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class BoysRoom(MapTile):
+    name = 'Boys Room'
+
     N = "green_room"
     S = ""
     E = ""
     W = ""
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class FlowerRoom(MapTile):
+    name = 'Flower Room'
+
     N = ""
     S = "green_room"
     E = "veg_room"
     W = ""
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class VegRoom(MapTile):
+    name = 'Veg Room'
+
     N = ""
     S = "lobby_room"
     E = "clone_room"
     W = "flower_room"
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class CloneRoom(MapTile):
+    name = 'Clone Room'
+
     N = ""
     S = "bar_room"
     E = ""
     W = "veg_room"
 
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 class SkateRoom(MapTile):
+    name = 'Skate Room'
+
     N = "bar_room"
     S = ""
     E = ""
     W = ""
+
+    def description(self):
+        message = 'You are in the {}'.format(self.name)
+        return room_description(self, message)
+
 
 
 rooms = {

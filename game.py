@@ -6,17 +6,8 @@ import datetime
 
 from player import Player
 from map import rooms
+from messages import insult
 
-
-def insult():
-    insult_lib = [
-        'oops, that was fucking stupid.',
-        'youre an opp bro fuck outta here',
-        'lemme get a dollar man',
-        'aye bro lemme hit that'
-
-    ]
-    return random.choice(insult_lib)
 
 
 def user_name(retries=10):
@@ -25,7 +16,7 @@ def user_name(retries=10):
 
         if not isinstance(name, str):
             raise ValueError()
-        
+
     except ValueError as e:
         print(insult())
         retries = retries - 1
@@ -33,7 +24,7 @@ def user_name(retries=10):
         if retries > 0:
             return user_name(retries)
         else:
-            print('you fucked up hard. quitting.')
+            print(insult())
             sys.exit(1)
     else:
         return name
@@ -43,33 +34,41 @@ def user_name(retries=10):
 def user_age(retries=10):
     try:
         age = input("Give me your age: ")
-        
+
         if not isinstance(age, int):
             raise ValueError()
-        
+
     except ValueError as e:
-        print('oops, that was fucking stupid. retry.')
+        print(insult())
         retries = retries - 1
 
         if retries > 0:
             return user_age(retries)
         else:
-            print('you fucked up hard. quitting.')
+            print(insult())
             sys.exit(1)
     else:
         return age
 
 
-def validate_age(age):
-
+def user_cmd(retries=10):
     try:
-        if age < 6 or age > 110:
-            raise ValueError("invalid user age")
-        else:
-            return age
+        cmd = raw_input("Give me your command: ")
+
+        if not isinstance(cmd, str):
+            raise ValueError()
+
     except ValueError as e:
-        print(e)
-        return user_age()
+        print(insult())
+        retries = retries - 1
+
+        if retries > 0:
+            return user_cmd(retries)
+        else:
+            print(insult())
+            sys.exit(1)
+    else:
+        return cmd
 
 
 def validate_name(name):
@@ -87,11 +86,23 @@ def validate_name(name):
         elif sum([1 for m in re.finditer(rules['one_special_char'], name)]) < 1:
             raise ValueError("invalid user name, must contain at least one special character")
         else:
-            
             return name
     except ValueError as e:
         print(e)
         return user_name()
+
+
+def validate_age(age):
+
+    try:
+        if age < 6 or age > 110:
+            raise ValueError("invalid user age")
+        else:
+            return age
+    except ValueError as e:
+        print(e)
+        return user_age()
+
 
 
 def play():
@@ -130,8 +141,10 @@ def play():
 
     while player.is_alive():
 
-        print('the game is running')
+        cmd = user_cmd()
 
+        player.move(cmd)
+        player.description()
 
 
 play()

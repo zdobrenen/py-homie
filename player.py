@@ -1,6 +1,7 @@
 
 
 from map import rooms
+from messages import insult
 
 
 class Player(object):
@@ -28,10 +29,18 @@ class Player(object):
         }
 
 
-        current_room = rooms[self.room]
-        next_room = getattr(current_room, direction)
-
-        if next_room:
-            self.room = next_room
+        try:
+            current_room = rooms[self.room]
+            next_room = getattr(current_room, direction)
+        except Exception as e:
+            print(e)
+            print(insult())
         else:
-            pass
+            if next_room:
+                self.room = next_room
+            else:
+                print(insult())
+
+
+    def description(self):
+        print '{}. {}'.format(self.name, rooms[self.room].description())
