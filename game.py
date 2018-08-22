@@ -96,7 +96,7 @@ def validate_age(age):
 
     try:
         if age < 6 or age > 110:
-            raise ValueError("invalid user age")
+            raise ValueError(insult())
         else:
             return age
     except ValueError as e:
