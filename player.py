@@ -4,6 +4,15 @@ from map import rooms
 from messages import insult
 
 
+def player_description(player):
+    message = []
+    message.append('## {} \n'.format(player.name))
+    message.append('## \n')
+    message.append(rooms[player.room].description())
+
+    return ''.join(message)
+
+
 class Player(object):
 
     def __init__(self, name, age, health, damage, room):
@@ -43,8 +52,4 @@ class Player(object):
 
 
     def description(self):
-        message = []
-        message.append('## {} \n'.format(self.name))
-        message.append(rooms[self.room].description())
-
-        return ''.join(message)
+        return player_description(self)

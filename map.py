@@ -3,6 +3,7 @@
 def room_description(room):
     message = []
     message.append('## You are in the {}. \n'.format(room.name))
+    message.append('## \n')
     message.append('## You can go: \n')
 
     for d in room.directions():
