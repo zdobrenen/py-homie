@@ -1,6 +1,14 @@
 
-def room_description(room, description):
-    return description
+
+def room_description(room):
+    message = []
+    message.append('## You are in the {}. \n'.format(room.name))
+    message.append('## You can go: \n')
+
+    for d in room.directions():
+        message.append('## \t{} \n'.format(d))
+
+    return ''.join(message)
 
 
 class MapTile(object):
@@ -25,8 +33,7 @@ class MapTile(object):
             'W': 'west'
         }
 
-        NSEW = [labels[d] for d in dir(self) if len(d) == 1 and d in "NSEW" and getattr(self, d)]
-        return "You can go: \n" + "\n".join(NSEW)
+        return [labels[d] for d in dir(self) if len(d) == 1 and d in "NSEW" and getattr(self, d)]
 
 
 class EntranceRoom(MapTile):
@@ -38,8 +45,7 @@ class EntranceRoom(MapTile):
     W = ""
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class LobbyRoom(MapTile):
@@ -51,8 +57,7 @@ class LobbyRoom(MapTile):
     W = "green_room"
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class BarRoom(MapTile):
@@ -64,8 +69,7 @@ class BarRoom(MapTile):
     W = "lobby_room"
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class GreenRoom(MapTile):
@@ -77,8 +81,7 @@ class GreenRoom(MapTile):
     W = ""
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class BoysRoom(MapTile):
@@ -90,8 +93,7 @@ class BoysRoom(MapTile):
     W = ""
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class FlowerRoom(MapTile):
@@ -103,8 +105,7 @@ class FlowerRoom(MapTile):
     W = ""
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class VegRoom(MapTile):
@@ -116,8 +117,7 @@ class VegRoom(MapTile):
     W = "flower_room"
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class CloneRoom(MapTile):
@@ -129,8 +129,7 @@ class CloneRoom(MapTile):
     W = "veg_room"
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 class SkateRoom(MapTile):
@@ -142,8 +141,7 @@ class SkateRoom(MapTile):
     W = ""
 
     def description(self):
-        message = 'You are in the {}'.format(self.name)
-        return room_description(self, message)
+        return room_description(self)
 
 
 

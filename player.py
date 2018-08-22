@@ -43,4 +43,8 @@ class Player(object):
 
 
     def description(self):
-        print '{}. {}'.format(self.name, rooms[self.room].description())
+        message = []
+        message.append('## {} \n'.format(self.name))
+        message.append(rooms[self.room].description())
+
+        return ''.join(message)

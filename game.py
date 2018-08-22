@@ -12,7 +12,7 @@ from messages import insult
 
 def user_name(retries=10):
     try:
-        name = raw_input("Give me your name: ")
+        name = raw_input("## Give me your name: ")
 
         if not isinstance(name, str):
             raise ValueError()
@@ -33,7 +33,7 @@ def user_name(retries=10):
 
 def user_age(retries=10):
     try:
-        age = input("Give me your age: ")
+        age = input("## Give me your age: ")
 
         if not isinstance(age, int):
             raise ValueError()
@@ -53,7 +53,7 @@ def user_age(retries=10):
 
 def user_cmd(retries=10):
     try:
-        cmd = raw_input("Give me your command: ")
+        cmd = raw_input("## Give me your command: ")
 
         if not isinstance(cmd, str):
             raise ValueError()
@@ -80,11 +80,11 @@ def validate_name(name):
 
     try:
         if len(name) < 5 or len(name) > 20:
-            raise ValueError("invalid user name")
+            raise ValueError(insult())
         elif sum([1 for m in re.finditer(rules['one_numeric_char'], name)]) < 1:
-            raise ValueError("invalid user name, must contain at least one numeric character")
+            raise ValueError(insult())
         elif sum([1 for m in re.finditer(rules['one_special_char'], name)]) < 1:
-            raise ValueError("invalid user name, must contain at least one special character")
+            raise ValueError(insult())
         else:
             return name
     except ValueError as e:
@@ -107,24 +107,24 @@ def validate_age(age):
 
 def play():
 
-    print(" _______     ___    _  ______     .--.      .--.   ____   ,---------.   _______   .---.  .---. ")
-    print("\  ____  \ .'   |  | ||    _ `''. |  |_     |  | .'  __ `.\          \ /   __  \  |   |  |_ _| ")
-    print("| |    \ | |   .'  | || _ | ) _  \| _( )_   |  |/   '  \  \`--.  ,---'| ,_/  \__) |   |  ( ' ) ")
-    print("| |____/ / .'  '_  | ||( ''_'  ) ||(_ o _)  |  ||___|  /  |   |   \ ,-./  )       |   '-(_{;}_)")
-    print("|   _ _ '. '   ( \.-.|| . (_) `. || (_,_) \ |  |   _.-`   |   :_ _: \  '_ '`)     |      (_,_) ")
-    print("|  ( ' )  \' (`. _` /||(_    ._) '|  |/    \|  |.'   _    |   (_I_)  > (_)  )  __ | _ _--.   | ")
-    print("| (_{;}_) || (_ (_) _)|  (_.\.' / |  '  /\  `  ||  _( )_  |  (_(=)_)(  .  .-'_/  )|( ' ) |   | ")
-    print("|  (_,_)  / \ /  . \ /|       .'  |    /  \    |\ (_ o _) /   (_I_)  `-'`-'     / (_{;}_)|   | ")
-    print("/_______.'   ``-'`-'' '-----'`    `---'    `---` '.(_,_).'    '---'    `._____.'  '(_,_) '---' ")
-    print(",---------. .---.  .---.     .-''-.            .-_'''-.      ____    ,---.    ,---.    .-''-.  ")
-    print("\          \|   |  |_ _|   .'_ _   \          '_( )_   \   .'  __ `. |    \  /    |  .'_ _   \ ")
-    print(" `--.  ,---'|   |  ( ' )  / ( ` )   '        |(_ o _)|  ' /   '  \  \|  ,  \/  ,  | / ( ` )   '")
-    print("    |   \   |   '-(_{;}_). (_ o _)  |        . (_,_)/___| |___|  /  ||  |\_   /|  |. (_ o _)  |")
-    print("    :_ _:   |      (_,_) |  (_,_)___|        |  |  .-----.   _.-`   ||  _( )_/ |  ||  (_,_)___|")
-    print("    (_I_)   | _ _--.   | '  \   .---.        '  \  '-   .'.'   _    || (_ o _) |  |'  \   .---.")
-    print("   (_(=)_)  |( ' ) |   |  \  `-'    /         \  `-'`   | |  _( )_  ||  (_,_)  |  | \  `-'    /")
-    print("    (_I_)   (_{;}_)|   |   \       /           \        / \ (_ o _) /|  |      |  |  \       / ")
-    print("    '---'   '(_,_) '---'    `'-..-'             `'-...-'   '.(_,_).' '--'      '--'   `'-..-'  ")
+    print("##  _______     ___    _  ______     .--.      .--.   ____   ,---------.   _______   .---.  .---. ")
+    print("## \  ____  \ .'   |  | ||    _ `''. |  |_     |  | .'  __ `.\          \ /   __  \  |   |  |_ _| ")
+    print("## | |    \ | |   .'  | || _ | ) _  \| _( )_   |  |/   '  \  \`--.  ,---'| ,_/  \__) |   |  ( ' ) ")
+    print("## | |____/ / .'  '_  | ||( ''_'  ) ||(_ o _)  |  ||___|  /  |   |   \ ,-./  )       |   '-(_{;}_)")
+    print("## |   _ _ '. '   ( \.-.|| . (_) `. || (_,_) \ |  |   _.-`   |   :_ _: \  '_ '`)     |      (_,_) ")
+    print("## |  ( ' )  \' (`. _` /||(_    ._) '|  |/    \|  |.'   _    |   (_I_)  > (_)  )  __ | _ _--.   | ")
+    print("## | (_{;}_) || (_ (_) _)|  (_.\.' / |  '  /\  `  ||  _( )_  |  (_(=)_)(  .  .-'_/  )|( ' ) |   | ")
+    print("## |  (_,_)  / \ /  . \ /|       .'  |    /  \    |\ (_ o _) /   (_I_)  `-'`-'     / (_{;}_)|   | ")
+    print("## /_______.'   ``-'`-'' '-----'`    `---'    `---` '.(_,_).'    '---'    `._____.'  '(_,_) '---' ")
+    print("## ,---------. .---.  .---.     .-''-.            .-_'''-.      ____    ,---.    ,---.    .-''-.  ")
+    print("## \          \|   |  |_ _|   .'_ _   \          '_( )_   \   .'  __ `. |    \  /    |  .'_ _   \ ")
+    print("##  `--.  ,---'|   |  ( ' )  / ( ` )   '        |(_ o _)|  ' /   '  \  \|  ,  \/  ,  | / ( ` )   '")
+    print("##     |   \   |   '-(_{;}_). (_ o _)  |        . (_,_)/___| |___|  /  ||  |\_   /|  |. (_ o _)  |")
+    print("##     :_ _:   |      (_,_) |  (_,_)___|        |  |  .-----.   _.-`   ||  _( )_/ |  ||  (_,_)___|")
+    print("##     (_I_)   | _ _--.   | '  \   .---.        '  \  '-   .'.'   _    || (_ o _) |  |'  \   .---.")
+    print("##    (_(=)_)  |( ' ) |   |  \  `-'    /         \  `-'`   | |  _( )_  ||  (_,_)  |  | \  `-'    /")
+    print("##     (_I_)   (_{;}_)|   |   \       /           \        / \ (_ o _) /|  |      |  |  \       / ")
+    print("##     '---'   '(_,_) '---'    `'-..-'             `'-...-'   '.(_,_).' '--'      '--'   `'-..-'  ")
     print("")
     print("")
     print("")
@@ -138,13 +138,15 @@ def play():
 
 
     player = Player(name, age, 100, 0, 'entrance_room')
+    print player.description()
+
 
     while player.is_alive():
 
         cmd = user_cmd()
 
         player.move(cmd)
-        player.description()
+        print player.description()
 
 
 play()
