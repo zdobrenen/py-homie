@@ -6,6 +6,7 @@ import array
 
 from pygame.locals import *
 
+from bounds import Bound, breaking
 from camera import Camera
 from loader import load_image
 from maps import Map, map_files, map_tiles, map_1, map_1_rot
@@ -45,10 +46,12 @@ def main():
 	# initialize game objects
 	camera = Camera()
 	player = Player()
+	bound  = Bound()
 
 	# create sprite groups
 	map_s     = pygame.sprite.Group()
 	player_s  = pygame.sprite.Group()
+	bound_s  = pygame.sprite.Group()  
 
 
 	for tile in map_tiles:
@@ -60,6 +63,7 @@ def main():
 
 
 	player_s.add(player)
+	bound_s.add(bound)
 
 
 	# enter game loop
@@ -105,6 +109,12 @@ def main():
 
 		player_s.update(camera.x, camera.y)
 		player_s.draw(screen)
+
+
+		# conditional events
+		if breaking(player.x + CENTER_W, player.y + CENTER_H):
+			bound_s.update()
+			bound_s.draw(screen)
 
 		pygame.display.flip()
 		clock.tick(64)

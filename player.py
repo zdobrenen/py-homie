@@ -102,8 +102,8 @@ class Player(pygame.sprite.Sprite):
 		self.maxspeed       = 12.0
 		self.minspeed       = -1.85
 		self.acceleration   = 0.3
-		self.deacceleration = 0.35
-		self.softening      = 0.04
+		self.deacceleration = 0.7
+		self.softening      = 0.3
 		self.steering       = 10.00
 
 
