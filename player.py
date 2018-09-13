@@ -3,13 +3,17 @@ import sys
 import pygame
 import math
 import glob
-
-import maps
+import random
 
 from pygame.locals import *
 
+import maps
+
 from loader import load_image
 
+
+CENTER_X = -1
+CENTER_Y = -1
 
 
 def rot_image(player):
@@ -56,6 +60,18 @@ def rot_image(player):
 	return rot_image, rot_rect
 
 
+def findspawn():
+	x = random.randint(0, 9)
+	y = random.randint(0, 9)
+
+	while(maps.map_1[y][x] == 5):
+		x = random.randint(0, 9)
+		y = random.randint(0, 9)
+
+	return x * 1000 + CENTER_X, y * 1000 + CENTER_Y
+
+
+
 class Player(pygame.sprite.Sprite):
 
 
@@ -96,6 +112,7 @@ class Player(pygame.sprite.Sprite):
 		self.screen       = pygame.display.get_surface()
 		self.area         = self.screen.get_rect()
 		self.rect.topleft = self.x, self.y
+		self.x, self.y    = findspawn()
 
 		self.dir            = 0
 		self.speed          = 0.0
@@ -105,6 +122,18 @@ class Player(pygame.sprite.Sprite):
 		self.deacceleration = 0.7
 		self.softening      = 0.3
 		self.steering       = 10.00
+
+
+	def reset(self):
+		self.x = int(pygame.display.Info().current_w / 2)
+		self.y = int(pygame.display.Info().current_h / 2)
+		
+		self.speed = 0.0
+		self.dir   = 0
+		
+		self.image, self.rect = rot_image(self)
+		self.rect.topleft = self.x, self.y
+		self.x, self.y = findspawn()
 
 
 	def accelerate(self):

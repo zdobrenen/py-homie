@@ -82,6 +82,10 @@ def main():
 					pygame.quit()
 					sys.exit(0)
 
+				if event.key == pygame.K_p:
+					player.reset()
+
+
 		# check key input, (keydown event - trigger many)
 		keys = pygame.key.get_pressed()
 
