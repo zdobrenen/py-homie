@@ -21,7 +21,7 @@ def rot_image(player):
 		rotate an image while keeping its center
 	"""
 
-	stationary = abs(0.0 - player.speed) <= 0.1
+	stationary = abs(0.0 - player.speed) <= 0.9
 
 	if (player.dir >= 0 and player.dir < 45) \
 	or (player.dir > 315 and player.dir <= 360):
@@ -52,7 +52,6 @@ def rot_image(player):
 
 		player.image_og = player.R_IMAGES[player.index]
 
-	print(player.speed)
 	player.index += 1
 
 	rot_image = pygame.transform.rotate(player.image_og, 0)
@@ -123,6 +122,10 @@ class Player(pygame.sprite.Sprite):
 		self.softening      = 0.3
 		self.steering       = 10.00
 
+		self.coin           = 0
+		self.beer           = 0
+		self.weed           = 0
+
 
 	def reset(self):
 		self.x = int(pygame.display.Info().current_w / 2)
@@ -178,6 +181,18 @@ class Player(pygame.sprite.Sprite):
 		self.image, self.rect = rot_image(self)
 
 
-	def update(self, last_x, last_y):
+	def collect(self, art):
+		
+		if art == 'coin':
+			self.coin += 1
+
+		if art == 'beer':
+			self.beer += 1
+
+		if art == 'weed':
+			self.weed += 1
+
+
+	def update(self, cam_x, cam_y):
 		self.x = self.x + self.speed * math.cos(math.radians(270-self.dir))
 		self.y = self.y + self.speed * math.sin(math.radians(270-self.dir))
