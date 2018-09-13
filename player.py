@@ -12,12 +12,47 @@ from loader import load_image
 
 
 
-def rot_center(image, rect, angle):
+def rot_image(player):
 	""" Rotate Player - 
 		rotate an image while keeping its center
 	"""
-	rot_image = pygame.transform.rotate(image, angle)
-	rot_rect  = rot_image.get_rect(center=rect.center)
+
+	stationary = abs(0.0 - player.speed) <= 0.1
+
+	if (player.dir >= 0 and player.dir < 45) \
+	or (player.dir > 315 and player.dir <= 360):
+		# UP
+		if stationary or player.index >= len(player.U_IMAGES):
+			player.index = 0
+
+		player.image_og = player.U_IMAGES[player.index]
+
+	if player.dir > 45 and player.dir < 135:
+		# Left
+		if stationary or player.index >= len(player.L_IMAGES):
+			player.index = 0
+
+		player.image_og = player.L_IMAGES[player.index]
+
+	if player.dir > 135 and player.dir < 225:
+		# DOWN
+		if stationary or player.index >= len(player.D_IMAGES):
+			player.index = 0
+
+		player.image_og = player.D_IMAGES[player.index]
+
+	if player.dir > 225 and player.dir < 315:
+		# Right
+		if stationary or player.index >= len(player.R_IMAGES):
+			player.index = 0
+
+		player.image_og = player.R_IMAGES[player.index]
+
+	print(player.speed)
+	player.index += 1
+
+	rot_image = pygame.transform.rotate(player.image_og, 0)
+	rot_rect  = rot_image.get_rect(center=player.rect.center)
 	return rot_image, rot_rect
 
 
@@ -33,27 +68,29 @@ class Player(pygame.sprite.Sprite):
 		self.x = CENTER_X
 		self.y = CENTER_Y
 
-		self.L_IMAGES = [load_image('blocky/{}'.format(f.split('/')[-1]))
-				for f in glob.glob('media/blocky/*.png')
+		self.L_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
 				if 'walkleft' in f
 			   ]
 
-		self.R_IMAGES = [load_image('blocky/{}'.format(f.split('/')[-1]))
-				for f in glob.glob('media/blocky/*.png')
+		self.R_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
 				if 'walkright' in f
 			   ]
 
-		self.U_IMAGES = [load_image('blocky/{}'.format(f.split('/')[-1]))
-				for f in glob.glob('media/blocky/*.png')
+		self.U_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
 				if 'walkup' in f
 			   ]
 
-		self.D_IMAGES = [load_image('blocky/{}'.format(f.split('/')[-1]))
-				for f in glob.glob('media/blocky/*.png')
+		self.D_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
 				if 'walkdown' in f
 			   ]
 
-		self.image        = self.U_IMAGES[0]
+
+		self.index        = 0
+		self.image        = self.U_IMAGES[self.index]
 		self.rect         = self.image.get_rect()
 		self.image_og     = self.image
 		self.screen       = pygame.display.get_surface()
@@ -62,22 +99,26 @@ class Player(pygame.sprite.Sprite):
 
 		self.dir            = 0
 		self.speed          = 0.0
-		self.maxspeed       = 20.5
+		self.maxspeed       = 12.0
 		self.minspeed       = -1.85
-		self.acceleration   = 0.6
+		self.acceleration   = 0.3
 		self.deacceleration = 0.35
 		self.softening      = 0.04
-		self.steering       = 2.60
+		self.steering       = 10.00
 
 
 	def accelerate(self):
 		if self.speed < self.maxspeed:
 			self.speed += self.acceleration
 
+		self.image, self.rect = rot_image(self)
+
 
 	def deaccelerate(self):
 		if self.speed > self.minspeed:
 			self.speed -= self.deacceleration
+
+		self.image, self.rect = rot_image(self)
 
 
 	def steerleft(self):
@@ -86,7 +127,7 @@ class Player(pygame.sprite.Sprite):
 		if self.dir > 360:
 			self.dir = 0
 
-		self.image, self.rect = rot_center(self.image_og, self.rect, self.dir)
+		self.image, self.rect = rot_image(self)
 
 
 	def steerright(self):
@@ -95,7 +136,7 @@ class Player(pygame.sprite.Sprite):
 		if self.dir < 0:
 			self.dir = 360
 
-		self.image, self.rect = rot_center(self.image_og, self.rect, self.dir)
+		self.image, self.rect = rot_image(self)
 
 
 	def soften(self):
@@ -104,6 +145,8 @@ class Player(pygame.sprite.Sprite):
 
 		if self.speed < 0:
 			self.speed += self.softening
+
+		self.image, self.rect = rot_image(self)
 
 
 	def update(self, last_x, last_y):
