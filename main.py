@@ -7,13 +7,13 @@ import array
 from pygame.locals import *
 
 from artifacts import Coin, Beer, Weed
+from autobots import AutoBot
 from bounds import Bound, breaking
 from camera import Camera
 from gamemode import GameMode
 from loader import load_image
 from maps import Map, map_files, map_tiles, map_1, map_1_rot
 from player import Player
-
 
 
 
@@ -53,6 +53,7 @@ def main():
 	# create sprite groups
 	map_s      = pygame.sprite.Group()
 	player_s   = pygame.sprite.Group()
+	autobot_s  = pygame.sprite.Group()
 	bound_s    = pygame.sprite.Group() 
 	coin_s     = pygame.sprite.Group()
 	beer_s     = pygame.sprite.Group()
@@ -69,7 +70,9 @@ def main():
 	player_s.add(player)
 	bound_s.add(bound)
 
-	artifacts = {}
+	for _ in xrange(0, 100):
+		autobot_s.add(AutoBot())
+
 	for _ in xrange(0, 1000):
 		choice = random.choice(['coin', 'beer', 'weed'])
 
@@ -151,6 +154,9 @@ def main():
 		player_s.update(camera.x, camera.y)
 		player_s.draw(screen)
 
+		autobot_s.update(camera.x, camera.y)
+		autobot_s.draw(screen)
+
 		coin_s.update(camera.x, camera.y)
 		coin_s.draw(screen)
 
@@ -160,7 +166,7 @@ def main():
 		weed_s.update(camera.x, camera.y)
 		weed_s.draw(screen)
 
-		
+
 		# conditional events
 		if breaking(player.x + CENTER_W, player.y + CENTER_H):
 			bound_s.update()
@@ -176,6 +182,9 @@ def main():
 
 		if pygame.sprite.spritecollide(player, weed_s, True):
 			player.collect('weed')
+
+		if pygame.sprite.spritecollide(player, autobot_s, False):
+			pass
 
 		# blit blit
 		screen.blit(text_fps, textpos_fps)

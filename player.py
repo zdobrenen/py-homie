@@ -104,14 +104,14 @@ class Player(pygame.sprite.Sprite):
 			   ]
 
 
-		self.index        = 0
-		self.image        = self.U_IMAGES[self.index]
-		self.rect         = self.image.get_rect()
-		self.image_og     = self.image
-		self.screen       = pygame.display.get_surface()
-		self.area         = self.screen.get_rect()
-		self.rect.topleft = self.x, self.y
-		self.x, self.y    = findspawn()
+		self.index          = 0
+		self.image          = self.U_IMAGES[self.index]
+		self.rect           = self.image.get_rect()
+		self.image_og       = self.image
+		self.screen         = pygame.display.get_surface()
+		self.area           = self.screen.get_rect()
+		self.rect.topleft   = self.x, self.y
+		self.x, self.y      = findspawn()
 
 		self.dir            = 0
 		self.speed          = 0.0
