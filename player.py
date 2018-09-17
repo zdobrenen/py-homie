@@ -4,6 +4,7 @@ import pygame
 import math
 import glob
 import random
+import time
 
 from pygame.locals import *
 
@@ -26,7 +27,21 @@ def rot_image(player):
 
 	stationary = abs(0.0 - player.speed) <= 0.9
 
-	if (player.dir >= 0 and player.dir < 45) \
+	if player.smoking:
+		if player.index >= len(player.W_IMAGES):
+			player.index = 0
+			player.smoking = False
+
+		player.image_og = player.W_IMAGES[player.index]
+
+	elif player.drinking:
+		if player.index >= len(player.B_IMAGES):
+			player.index = 0
+			player.drinking = False
+
+		player.image_og = player.B_IMAGES[player.index]
+
+	elif (player.dir >= 0 and player.dir < 45) \
 	or (player.dir > 315 and player.dir <= 360):
 		# UP
 		if stationary or player.index >= len(player.U_IMAGES):
@@ -34,26 +49,28 @@ def rot_image(player):
 
 		player.image_og = player.U_IMAGES[player.index]
 
-	if player.dir > 45 and player.dir < 135:
+	elif player.dir > 45 and player.dir < 135:
 		# Left
 		if stationary or player.index >= len(player.L_IMAGES):
 			player.index = 0
 
 		player.image_og = player.L_IMAGES[player.index]
 
-	if player.dir > 135 and player.dir < 225:
+	elif player.dir > 135 and player.dir < 225:
 		# DOWN
 		if stationary or player.index >= len(player.D_IMAGES):
 			player.index = 0
 
 		player.image_og = player.D_IMAGES[player.index]
 
-	if player.dir > 225 and player.dir < 315:
+	elif player.dir > 225 and player.dir < 315:
 		# Right
 		if stationary or player.index >= len(player.R_IMAGES):
 			player.index = 0
 
 		player.image_og = player.R_IMAGES[player.index]
+
+	
 
 	player.index += 1
 
@@ -106,6 +123,16 @@ class Player(pygame.sprite.Sprite):
 				if 'walkdown' in f
 			   ]
 
+		self.W_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
+				if 'smoking' in f
+			   ]
+
+		self.B_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
+				if 'drinking' in f
+			   ]
+
 
 		self.index          = 0
 		self.image          = self.U_IMAGES[self.index]
@@ -120,10 +147,17 @@ class Player(pygame.sprite.Sprite):
 		self.speed          = 0.0
 		self.maxspeed       = 12.0
 		self.minspeed       = -1.85
-		self.acceleration   = 0.3
+		self.acceleration   = 0.6
 		self.deacceleration = 0.7
 		self.softening      = 0.3
 		self.steering       = 10.00
+
+		self.health         = 100
+		self.smoking        = False
+		self.drinking       = False
+
+		self.drunkness      = 0.0
+		self.stoneness      = 0.0
 
 		self.coin           = 0
 		self.beer           = 0
@@ -201,6 +235,45 @@ class Player(pygame.sprite.Sprite):
 
 		if art == 'weed':
 			self.weed += 1
+
+
+	def smacked(self):
+
+		if self.speed > 0:
+			self.speed = -10 + self.drunkness
+
+		if self.health > 0:
+			self.health -= 1
+
+		if self.drunkness > 0:
+			self.drunkness -= 1
+
+		if self.stoneness > 0:
+			self.stoneness -= 1
+
+
+	def smoke(self):
+
+		if not self.smoking and self.weed > 0 and self.stoneness <= 100:
+			self.smoking   = True
+			self.speed     = 0
+			self.weed      = self.weed - 1
+			self.stoneness = self.stoneness + 1
+
+			if self.health < 100:
+				self.health    = self.health + 1
+
+			self.image, self.rect = rot_image(self)
+
+
+	def drink(self):
+
+		if not self.drinking and self.beer > 0 and self.drunkness <= 100:
+			self.drinking  = True
+			self.beer      = self.beer - 1
+			self.drunkness = self.drunkness + 1
+
+			self.image, self.rect = rot_image(self)
 
 
 	def update(self, cam_x, cam_y):
