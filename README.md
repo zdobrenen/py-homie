@@ -1,21 +1,20 @@
-BudWatch - The Game
-===================
+# BudWatch - The Game
 
 
-Installation:
-=============
+## Installation:
 
+```bash
 pip install -r requirements.txt
+```
 
+## Running:
 
-Running:
-========
-
+```bash
 python main.py
+```
 
+## Player Controls:
 
-Player Controls:
-================
 
 Move player with the arrow keys.
 
