@@ -133,6 +133,9 @@ def main():
 		if keys[K_d]:
 			player.drink()
 
+		if keys[K_t]:
+			player.timer()
+
 
 		# align camera view w/ player pos
 		camera.set_pos(player.x, player.y)
@@ -142,23 +145,26 @@ def main():
 		text_fps     = font.render('FPS: {}'.format(str(int(clock.get_fps()))), 1, (224, 16, 16))
 		textpos_fps  = text_fps.get_rect(centery=25, centerx=60) 
 
+		text_time    = font.render('Time: ' + str(int((player.timeleft / 60)/60)) + ":" + str(int((player.timeleft / 60) % 60)), 1, (224, 16, 16))
+		textpos_time = text_fps.get_rect(centery=45, centerx=60)
+
 		text_life    = font.render('Life: {}'.format(str(player.health)), 1, (224, 16, 16))
-		textpos_life = text_life.get_rect(centery=45, centerx=60)
+		textpos_life = text_fps.get_rect(centery=65, centerx=60)
 
 		text_coin    = font.render('Coin: {}'.format(str(player.coin)), 1, (224, 16, 16))
-		textpos_coin = text_coin.get_rect(centery=65, centerx=60)
+		textpos_coin = text_fps.get_rect(centery=85, centerx=60)
 
 		text_beer    = font.render('Beer: {}'.format(str(player.beer)), 1, (224, 16, 16))
-		textpos_beer = text_beer.get_rect(centery=85, centerx=60)
+		textpos_beer = text_fps.get_rect(centery=105, centerx=60)
 
 		text_weed    = font.render('Weed: {}'.format(str(player.weed)), 1, (224, 16, 16))
-		textpos_weed = text_weed.get_rect(centery=105, centerx=60)
+		textpos_weed = text_fps.get_rect(centery=125, centerx=60)
 
-		text_bac    = font.render('BAC: {}'.format(str(player.drunkness / 100)), 1, (224, 16, 16))
-		textpos_bac = text_bac.get_rect(centery=125, centerx=60)
+		text_bac    = font.render('BAC: {}'.format(str(player.drunkness)), 1, (224, 16, 16))
+		textpos_bac = text_fps.get_rect(centery=145, centerx=60)
 
-		text_thc    = font.render('THC: {}'.format(str(player.stoneness / 100)), 1, (224, 16, 16))
-		textpos_thc = text_thc.get_rect(centery=145, centerx=60)
+		text_thc    = font.render('THC: {}'.format(str(player.stoneness)), 1, (224, 16, 16))
+		textpos_thc = text_fps.get_rect(centery=165, centerx=60)
 
 
 		screen.blit(background, (0, 0))
@@ -207,6 +213,7 @@ def main():
 
 		# blit blit
 		screen.blit(text_fps, textpos_fps)
+		screen.blit(text_time, textpos_time)
 		screen.blit(text_life, textpos_life)
 		screen.blit(text_coin, textpos_coin)
 		screen.blit(text_beer, textpos_beer)

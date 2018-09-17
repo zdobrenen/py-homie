@@ -19,6 +19,9 @@ CENTER_Y = -1
 GRASS_SPEED = 0.715
 GRASS_GREEN = 75
 
+COUNTDOWN_FULL = 3600
+COUNTDOWN_EXTEND = 750
+
 
 def rot_image(player):
 	""" Rotate Player - 
@@ -151,6 +154,7 @@ class Player(pygame.sprite.Sprite):
 		self.deacceleration = 0.7
 		self.softening      = 0.3
 		self.steering       = 10.00
+		self.impact         = -(self.maxspeed * 2)
 
 		self.health         = 100
 		self.smoking        = False
@@ -162,6 +166,8 @@ class Player(pygame.sprite.Sprite):
 		self.coin           = 0
 		self.beer           = 0
 		self.weed           = 0
+
+		self.timeleft       = COUNTDOWN_FULL
 
 
 	def reset(self):
@@ -224,7 +230,6 @@ class Player(pygame.sprite.Sprite):
 				self.speed = self.speed - self.deacceleration * 2
 
 
-
 	def collect(self, art):
 		
 		if art == 'coin':
@@ -239,17 +244,12 @@ class Player(pygame.sprite.Sprite):
 
 	def smacked(self):
 
-		if self.speed > 0:
-			self.speed = -10 + self.drunkness
+		if not self.drunkness > 0.0:
+			if self.speed > 0:
+				self.speed = self.speed + self.impact
 
-		if self.health > 0:
-			self.health -= 1
-
-		if self.drunkness > 0:
-			self.drunkness -= 1
-
-		if self.stoneness > 0:
-			self.stoneness -= 1
+			if self.health > 0:
+				self.health -= 1
 
 
 	def smoke(self):
@@ -261,7 +261,7 @@ class Player(pygame.sprite.Sprite):
 			self.stoneness = self.stoneness + 1
 
 			if self.health < 100:
-				self.health    = self.health + 1
+				self.health = self.health + 1
 
 			self.image, self.rect = rot_image(self)
 
@@ -270,12 +270,35 @@ class Player(pygame.sprite.Sprite):
 
 		if not self.drinking and self.beer > 0 and self.drunkness <= 100:
 			self.drinking  = True
+			self.speed     = 0
 			self.beer      = self.beer - 1
 			self.drunkness = self.drunkness + 1
 
 			self.image, self.rect = rot_image(self)
 
 
+	def timer(self):
+
+		if self.coin > 0 and self.timeleft < COUNTDOWN_FULL:
+			self.coin     = self.coin - 1
+			self.timeleft = self.timeleft + COUNTDOWN_EXTEND
+
+			if self.timeleft > COUNTDOWN_FULL:
+				self.timeleft = COUNTDOWN_FULL
+
+
 	def update(self, cam_x, cam_y):
 		self.x = self.x + self.speed * math.cos(math.radians(270-self.dir))
 		self.y = self.y + self.speed * math.sin(math.radians(270-self.dir))
+
+
+		if self.timeleft > 0:
+			self.timeleft = self.timeleft - 1
+
+
+		if self.drunkness > 0.0:
+			self.drunkness = round(self.drunkness - 0.001, 3)
+
+
+		if self.stoneness > 0.0:
+			self.stoneness = round(self.stoneness - 0.001, 3)
