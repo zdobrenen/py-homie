@@ -10,17 +10,20 @@ import maps
 
 from loader import load_image
 
+BOUND_MIN = 0
+BOUND_MAX = 1000 * 10
 
 HALF_TILE = 500
 FULL_TILE = 1000
 CENTER_W = -1
 CENTER_H = -1
 
-TURN_RADIUS = 20
+TURN_RADIUS = 150
+
 
 def rot_image(autobot):
 
-	rot_image = pygame.transform.rotate(autobot.image, autobot.dir)
+	rot_image = pygame.transform.rotate(autobot.image_og, autobot.dir)
 	rot_rect  = rot_image.get_rect(center=autobot.rect.center)
 	return rot_image, rot_rect
 
@@ -36,8 +39,10 @@ def cpoints(center, r=TURN_RADIUS, n=4):
 
 class AutoBot(pygame.sprite.Sprite):
 
-	def __init__(self):
+	def __init__(self, id):
 		pygame.sprite.Sprite.__init__(self)
+
+		self.id             = id
 		
 		self.image          = load_image('automobiles/{}'.format('car_0.png'), True)
 		self.rect           = self.image.get_rect()
@@ -48,8 +53,9 @@ class AutoBot(pygame.sprite.Sprite):
 		self.y              = 5
 
 		self.dir            = 0
+		self.dir_og         = self.dir
 		self.speed          = 0
-		self.maxspeed       = 10.0
+		self.maxspeed       = 20.0
 		self.minspeed       = -1.85
 		self.acceleration   = 0.3
 		self.deacceleration = 0.7
@@ -63,7 +69,7 @@ class AutoBot(pygame.sprite.Sprite):
 		x = random.randint(0, 9)
 		y = random.randint(0, 9)
 
-		while (maps.map_1[y][x] == 5):
+		while (maps.map_1[y][x] == 5) or (maps.map_1[y][x]):
 			x = random.randint(0, 9)
 			y = random.randint(0, 9)
 
@@ -73,14 +79,21 @@ class AutoBot(pygame.sprite.Sprite):
 		self.rect.topleft = self.x, self.y
 
 
-	def grass(self, x, y):
+	def inbounds(self):
+		if self.x < BOUND_MIN or self.x > BOUND_MAX:
+			return False
 
-		value = self.screen.get_at((x, y)).g
+		if self.y < BOUND_MIN or self.y > BOUND_MAX:
+			return False
 
-		return value > 75
+		return True
 
 
 	def move(self):
+
+		if not self.inbounds():
+			self.generate()
+
 		idx_x, idx_y = int((self.x + CENTER_W) / 1000), int((self.y + CENTER_H) / 1000)
 
 		try:
@@ -89,89 +102,190 @@ class AutoBot(pygame.sprite.Sprite):
 		except IndexError as e:
 			pass
 		else:
-			tile_x = self.x % 1000
-			tile_y = self.y % 1000
+			tile_x = int(self.x % 1000)
+			tile_y = int(self.y % 1000)
+
 
 			if tile_type == maps.turn:
 				if tile_rot == 0:
 					turn_at = (480, 480)
+					options = [90, 180]
 					
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([270, 180])
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y <= 300:
+						self.generate()
+
+					if tile_x >= 700:
+						self.generate()
 
 				if tile_rot == 1:
 					turn_at = (480, 512)
-					
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([90, 180])
-						self.wait_turn = False
+					options = [270, 180]
+
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y <= 300:
+						self.generate()
+
+					if tile_x <= 300:
+						self.generate()
 
 				if tile_rot == 2:
 					turn_at = (512, 512)
-					
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([0, 90])
-						self.wait_turn = False
+					options = [0, 270]
+
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y >= 700:
+						self.generate()
+
+					if tile_x <= 300:
+						self.generate()
 
 				if tile_rot == 3:
 					turn_at = (512, 480)
+					options = [0, 90]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([0, 270])
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y >= 700:
+						self.generate()
+
+					if tile_x >= 700:
+						self.generate()
 
 			if tile_type == maps.split:
 				if tile_rot == 0:
-					turn_at = (480, 480)
+					turn_at = (485, 485)
+					options = [90, 180, 270]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([90, 180, 270])
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y <= 300:
+						self.generate()
 
 				if tile_rot == 1:
 					turn_at = (480, 512)
+					options = [0, 270, 180]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([0, 90, 180])
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_x <= 300:
+						self.generate()
 
 				if tile_rot == 2:
-					turn_at = (512, 512)
+					turn_at = (510, 520)
+					options = [0, 90, 270]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([0, 90, 270])
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y >= 700:
+						self.generate()
 
 				if tile_rot == 3:
 					turn_at = (512, 480)
+					options = [0, 180, 90]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = random.choice([0, 180, 270])
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
 
+					if tile_x >= 700:
+						self.generate()
+						
+
 			if tile_type == maps.crossing:
 				turn_at = (512, 480)
+				options = [0, 90, 180, 270]
 
-				if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-					self.dir = random.choice([0, 90, 180, 270])
-					self.wait_turn = False
+				dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+				if dist <= TURN_RADIUS:
+
+					if self.wait_turn:
+						self.dir = random.choice([d for d in options if d != (self.dir + 180) % 360])
+						self.wait_turn = False
+
+						self.image, self.rect = rot_image(self)
 				else:
 					self.wait_turn = True
 
@@ -179,46 +293,84 @@ class AutoBot(pygame.sprite.Sprite):
 				
 				if tile_rot == 0:
 					turn_at = (512, 225)
+					options = [180]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = 180
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = options[0]
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y <= 60:
+						self.generate()
 
 				if tile_rot == 1:
 					turn_at = (255, 480)
+					options = [270]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = 90
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = options[0]
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_x <= 60:
+						self.generate()
 
 				if tile_rot == 2:
 					turn_at = (512, 750)
+					options = [0]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = 0
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = options[0]
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_y >= 940:
+						self.generate()
 
 				if tile_rot == 3:
 					turn_at = (730, 480)
+					options = [90]
 
-					if abs(turn_at[0] - tile_x) <= TURN_RADIUS and abs(turn_at[1] - tile_y) <= TURN_RADIUS and self.wait_turn:
-						self.dir = 270
-						self.wait_turn = False
+					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
+
+					if dist <= TURN_RADIUS:
+
+						if self.wait_turn:
+							self.dir = options[0]
+							self.wait_turn = False
+
+							self.image, self.rect = rot_image(self)
 					else:
 						self.wait_turn = True
+
+					if tile_x >= 940:
+						self.generate()
 
 			if random.random() < .95:
 				self.accelerate()
 			else:
 				self.deaccelerate()
-
-			self.image, self.rect = rot_image(self)
 
 
 	def accelerate(self):
@@ -240,9 +392,9 @@ class AutoBot(pygame.sprite.Sprite):
 
 
 	def update(self, cam_x, cam_y):
-		self.move()
-
 		self.x = self.x + self.speed * math.cos(math.radians(270-self.dir))
 		self.y = self.y + self.speed * math.sin(math.radians(270-self.dir))
 
+		self.move()
+		
 		self.rect.topleft = self.x - cam_x, self.y - cam_y

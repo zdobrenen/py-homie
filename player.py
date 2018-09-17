@@ -15,6 +15,9 @@ from loader import load_image
 CENTER_X = -1
 CENTER_Y = -1
 
+GRASS_SPEED = 0.715
+GRASS_GREEN = 75
+
 
 def rot_image(player):
 	""" Rotate Player - 
@@ -179,6 +182,13 @@ class Player(pygame.sprite.Sprite):
 			self.speed += self.softening
 
 		self.image, self.rect = rot_image(self)
+
+
+	def grass(self, value):
+		if value > GRASS_GREEN:
+			if self.speed - self.deacceleration > GRASS_SPEED * 2:
+				self.speed = self.speed - self.deacceleration * 2
+
 
 
 	def collect(self, art):

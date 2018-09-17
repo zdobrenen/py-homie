@@ -16,6 +16,8 @@ from maps import Map, map_files, map_tiles, map_1, map_1_rot
 from player import Player
 
 
+ARTIFACT_COUNT = 1000
+AUTOBOT_COUNT  = 250
 
 
 def main():
@@ -70,10 +72,10 @@ def main():
 	player_s.add(player)
 	bound_s.add(bound)
 
-	for _ in xrange(0, 100):
-		autobot_s.add(AutoBot())
+	for id in xrange(0, AUTOBOT_COUNT):
+		autobot_s.add(AutoBot(id))
 
-	for _ in xrange(0, 1000):
+	for _ in xrange(0, ARTIFACT_COUNT):
 		choice = random.choice(['coin', 'beer', 'weed'])
 
 		if choice == 'coin':
@@ -150,6 +152,8 @@ def main():
 		# update sprite objects
 		map_s.update(camera.x, camera.y)
 		map_s.draw(screen)
+
+		player.grass(screen.get_at(((int(CENTER_W-5), int(CENTER_H-5)))).g)
 
 		player_s.update(camera.x, camera.y)
 		player_s.draw(screen)
