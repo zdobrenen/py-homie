@@ -69,7 +69,7 @@ class AutoBot(pygame.sprite.Sprite):
 		x = random.randint(0, 9)
 		y = random.randint(0, 9)
 
-		while (maps.map_1[y][x] == 5) or (maps.map_1[y][x]):
+		while (maps.map_1[y][x] in [1, 4, 5]):
 			x = random.randint(0, 9)
 			y = random.randint(0, 9)
 
@@ -110,6 +110,9 @@ class AutoBot(pygame.sprite.Sprite):
 				if tile_rot == 0:
 					turn_at = (480, 480)
 					options = [90, 180]
+
+					x_min, x_max = None, 700
+					y_min, y_max = 300, None 
 					
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
@@ -123,16 +126,19 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y <= 300:
+					if tile_y <= y_min:
 						self.generate()
 
-					if tile_x >= 700:
+					if tile_x >= x_max:
 						self.generate()
 
 				if tile_rot == 1:
 					turn_at = (480, 512)
 					options = [270, 180]
 
+					x_min, x_max = 300, None
+					y_min, y_max = 300, None
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -145,16 +151,19 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y <= 300:
+					if tile_y <= y_min:
 						self.generate()
 
-					if tile_x <= 300:
+					if tile_x <= x_min:
 						self.generate()
 
 				if tile_rot == 2:
 					turn_at = (512, 512)
 					options = [0, 270]
 
+					x_min, x_max = 300, None
+					y_min, y_max = None, 700
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -167,16 +176,19 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y >= 700:
+					if tile_y >= y_max:
 						self.generate()
 
-					if tile_x <= 300:
+					if tile_x <= x_min:
 						self.generate()
 
 				if tile_rot == 3:
 					turn_at = (512, 480)
 					options = [0, 90]
 
+					x_min, x_max = None, 700
+					y_min, y_max = None, 700
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -189,10 +201,10 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y >= 700:
+					if tile_y >= y_max:
 						self.generate()
 
-					if tile_x >= 700:
+					if tile_x >= x_max:
 						self.generate()
 
 			if tile_type == maps.split:
@@ -200,6 +212,9 @@ class AutoBot(pygame.sprite.Sprite):
 					turn_at = (485, 485)
 					options = [90, 180, 270]
 
+					x_min, x_max = None, None
+					y_min, y_max = 300, None
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -212,13 +227,16 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y <= 300:
+					if tile_y <= y_min:
 						self.generate()
 
 				if tile_rot == 1:
 					turn_at = (480, 512)
 					options = [0, 270, 180]
 
+					x_min, x_max = 300, None
+					y_min, y_max = None, None
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -231,13 +249,16 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_x <= 300:
+					if tile_x <= x_min:
 						self.generate()
 
 				if tile_rot == 2:
 					turn_at = (510, 520)
 					options = [0, 90, 270]
 
+					x_min, x_max = None, None
+					y_min, y_max = None, 700
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -250,13 +271,16 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y >= 700:
+					if tile_y >= y_max:
 						self.generate()
 
 				if tile_rot == 3:
 					turn_at = (512, 480)
 					options = [0, 180, 90]
 
+					x_min, x_max = None, 700
+					y_min, y_max = None, None
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -269,13 +293,16 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_x >= 700:
+					if tile_x >= x_max:
 						self.generate()
 						
 
 			if tile_type == maps.crossing:
 				turn_at = (512, 480)
 				options = [0, 90, 180, 270]
+
+				x_min, x_max = None, None
+				y_min, y_max = None, None
 
 				dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
@@ -295,6 +322,9 @@ class AutoBot(pygame.sprite.Sprite):
 					turn_at = (512, 225)
 					options = [180]
 
+					x_min, x_max = None, None
+					y_min, y_max = 60, None
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -307,13 +337,16 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y <= 60:
+					if tile_y <= y_min:
 						self.generate()
 
 				if tile_rot == 1:
 					turn_at = (255, 480)
 					options = [270]
 
+					x_min, x_max = 60, None
+					y_min, y_max = None, None
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -326,13 +359,16 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_x <= 60:
+					if tile_x <= x_min:
 						self.generate()
 
 				if tile_rot == 2:
 					turn_at = (512, 750)
 					options = [0]
 
+					x_min, x_max = None, None
+					y_min, y_max = None, 940
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -345,13 +381,16 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_y >= 940:
+					if tile_y >= y_max:
 						self.generate()
 
 				if tile_rot == 3:
 					turn_at = (730, 480)
 					options = [90]
 
+					x_min, x_max = None, 940
+					y_min, y_max = None, None
+
 					dist = int(math.sqrt(int(abs(turn_at[0] - tile_x))**2 + int(abs(turn_at[1] - tile_y))**2))
 
 					if dist <= TURN_RADIUS:
@@ -364,7 +403,7 @@ class AutoBot(pygame.sprite.Sprite):
 					else:
 						self.wait_turn = True
 
-					if tile_x >= 940:
+					if tile_x >= x_max:
 						self.generate()
 
 			if random.random() < .95:
