@@ -11,9 +11,11 @@ from autobots import AutoBot
 from bounds import Bound, breaking
 from camera import Camera
 from gamemode import GameMode
+from lifeout import LifeOut
 from loader import load_image
 from maps import Map, map_files, map_tiles, map_1, map_1_rot
 from player import Player
+from timeout import TimeOut
 
 
 ARTIFACT_COUNT = 1000
@@ -48,9 +50,11 @@ def main():
 	background.fill((26, 26, 26))
 
 	# initialize game objects
-	camera = Camera()
-	player = Player()
-	bound  = Bound()
+	camera  = Camera()
+	player  = Player()
+	bound   = Bound()
+	timeout = TimeOut()
+	lifeout = LifeOut()
 
 	# create sprite groups
 	map_s      = pygame.sprite.Group()
@@ -60,6 +64,9 @@ def main():
 	coin_s     = pygame.sprite.Group()
 	beer_s     = pygame.sprite.Group()
 	weed_s     = pygame.sprite.Group()
+	timeout_s  = pygame.sprite.Group()
+	lifeout_s  = pygame.sprite.Group()
+
 
 	for tile in map_tiles:
 		map_files.append(load_image('landscape/{}'.format(tile), False))
@@ -71,6 +78,9 @@ def main():
 
 	player_s.add(player)
 	bound_s.add(bound)
+	timeout_s.add(timeout)
+	lifeout_s.add(lifeout)
+
 
 	for id in xrange(0, AUTOBOT_COUNT):
 		autobot_s.add(AutoBot(id))
@@ -127,6 +137,15 @@ def main():
 		if keys[K_DOWN]:
 			player.deaccelerate()
 
+		if keys[K_s]:
+			player.smoke()
+
+		if keys[K_d]:
+			player.drink()
+
+		if keys[K_t]:
+			player.timer()
+
 
 		# align camera view w/ player pos
 		camera.set_pos(player.x, player.y)
@@ -136,14 +155,26 @@ def main():
 		text_fps     = font.render('FPS: {}'.format(str(int(clock.get_fps()))), 1, (224, 16, 16))
 		textpos_fps  = text_fps.get_rect(centery=25, centerx=60) 
 
+		text_time    = font.render('Time: ' + str(int((player.timeleft / 60)/60)) + ":" + str(int((player.timeleft / 60) % 60)), 1, (224, 16, 16))
+		textpos_time = text_fps.get_rect(centery=45, centerx=60)
+
+		text_life    = font.render('Life: {}'.format(str(player.health)), 1, (224, 16, 16))
+		textpos_life = text_fps.get_rect(centery=65, centerx=60)
+
 		text_coin    = font.render('Coin: {}'.format(str(player.coin)), 1, (224, 16, 16))
-		textpos_coin = text_coin.get_rect(centery=45, centerx=60)
+		textpos_coin = text_fps.get_rect(centery=85, centerx=60)
 
 		text_beer    = font.render('Beer: {}'.format(str(player.beer)), 1, (224, 16, 16))
-		textpos_beer = text_beer.get_rect(centery=65, centerx=60)
+		textpos_beer = text_fps.get_rect(centery=105, centerx=60)
 
 		text_weed    = font.render('Weed: {}'.format(str(player.weed)), 1, (224, 16, 16))
-		textpos_weed = text_weed.get_rect(centery=85, centerx=60)
+		textpos_weed = text_fps.get_rect(centery=125, centerx=60)
+
+		text_bac    = font.render('BAC: {}'.format(str(player.drunkness)), 1, (224, 16, 16))
+		textpos_bac = text_fps.get_rect(centery=145, centerx=60)
+
+		text_thc    = font.render('THC: {}'.format(str(player.stoneness)), 1, (224, 16, 16))
+		textpos_thc = text_fps.get_rect(centery=165, centerx=60)
 
 
 		screen.blit(background, (0, 0))
@@ -176,6 +207,15 @@ def main():
 			bound_s.update()
 			bound_s.draw(screen)
 
+		if player.timeleft == 0:
+			timeout_s.update()
+			timeout_s.draw(screen)
+			player.speed = 0
+
+		if player.health == 0:
+			lifeout_s.update()
+			lifeout_s.draw(screen)
+			player.speed = 0
 
 		# check collisions
 		if pygame.sprite.spritecollide(player, coin_s, True):
@@ -188,14 +228,17 @@ def main():
 			player.collect('weed')
 
 		if pygame.sprite.spritecollide(player, autobot_s, False):
-			pass
+			player.smacked()
 
 		# blit blit
 		screen.blit(text_fps, textpos_fps)
+		screen.blit(text_time, textpos_time)
+		screen.blit(text_life, textpos_life)
 		screen.blit(text_coin, textpos_coin)
 		screen.blit(text_beer, textpos_beer)
 		screen.blit(text_weed, textpos_weed)
-
+		screen.blit(text_bac, textpos_bac)
+		screen.blit(text_thc, textpos_thc)
 
 		# show display
 		pygame.display.flip()

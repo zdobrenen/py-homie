@@ -4,6 +4,7 @@ import pygame
 import math
 import glob
 import random
+import time
 
 from pygame.locals import *
 
@@ -18,6 +19,15 @@ CENTER_Y = -1
 GRASS_SPEED = 0.715
 GRASS_GREEN = 75
 
+COUNTDOWN_FULL = 3600
+COUNTDOWN_EXTEND = 750
+
+STONENESS_INCR = 10
+STONENESS_DECR = 1
+
+DRUNKNESS_INCR = 10
+DRUNKNESS_DECR = 1
+
 
 def rot_image(player):
 	""" Rotate Player - 
@@ -26,7 +36,21 @@ def rot_image(player):
 
 	stationary = abs(0.0 - player.speed) <= 0.9
 
-	if (player.dir >= 0 and player.dir < 45) \
+	if player.smoking:
+		if player.index >= len(player.W_IMAGES):
+			player.index = 0
+			player.smoking = False
+
+		player.image_og = player.W_IMAGES[player.index]
+
+	elif player.drinking:
+		if player.index >= len(player.B_IMAGES):
+			player.index = 0
+			player.drinking = False
+
+		player.image_og = player.B_IMAGES[player.index]
+
+	elif (player.dir >= 0 and player.dir < 45) \
 	or (player.dir > 315 and player.dir <= 360):
 		# UP
 		if stationary or player.index >= len(player.U_IMAGES):
@@ -34,26 +58,28 @@ def rot_image(player):
 
 		player.image_og = player.U_IMAGES[player.index]
 
-	if player.dir > 45 and player.dir < 135:
+	elif player.dir > 45 and player.dir < 135:
 		# Left
 		if stationary or player.index >= len(player.L_IMAGES):
 			player.index = 0
 
 		player.image_og = player.L_IMAGES[player.index]
 
-	if player.dir > 135 and player.dir < 225:
+	elif player.dir > 135 and player.dir < 225:
 		# DOWN
 		if stationary or player.index >= len(player.D_IMAGES):
 			player.index = 0
 
 		player.image_og = player.D_IMAGES[player.index]
 
-	if player.dir > 225 and player.dir < 315:
+	elif player.dir > 225 and player.dir < 315:
 		# Right
 		if stationary or player.index >= len(player.R_IMAGES):
 			player.index = 0
 
 		player.image_og = player.R_IMAGES[player.index]
+
+	
 
 	player.index += 1
 
@@ -106,6 +132,16 @@ class Player(pygame.sprite.Sprite):
 				if 'walkdown' in f
 			   ]
 
+		self.W_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
+				if 'smoking' in f
+			   ]
+
+		self.B_IMAGES = [load_image('player/{}'.format(f.split('/')[-1]))
+				for f in glob.glob('media/player/*.png')
+				if 'drinking' in f
+			   ]
+
 
 		self.index          = 0
 		self.image          = self.U_IMAGES[self.index]
@@ -120,14 +156,30 @@ class Player(pygame.sprite.Sprite):
 		self.speed          = 0.0
 		self.maxspeed       = 12.0
 		self.minspeed       = -1.85
-		self.acceleration   = 0.3
+		self.acceleration   = 0.6
 		self.deacceleration = 0.7
 		self.softening      = 0.3
 		self.steering       = 10.00
+		self.maximpact      = 10
+		self.minimpact      = -10
+
+		self.health         = 100
+		self.smoking        = False
+		self.drinking       = False
+
+		self.maxdrunk       = 100
+		self.mindrunk       = 0
+		self.maxstone       = 100
+		self.minstone       = 0
+
+		self.drunkness      = 0
+		self.stoneness      = 0
 
 		self.coin           = 0
 		self.beer           = 0
 		self.weed           = 0
+
+		self.timeleft       = COUNTDOWN_FULL
 
 
 	def reset(self):
@@ -190,7 +242,6 @@ class Player(pygame.sprite.Sprite):
 				self.speed = self.speed - self.deacceleration * 2
 
 
-
 	def collect(self, art):
 		
 		if art == 'coin':
@@ -203,6 +254,74 @@ class Player(pygame.sprite.Sprite):
 			self.weed += 1
 
 
+	def smacked(self):
+
+		denom = len(xrange(self.mindrunk, self.maxdrunk)) / len(xrange(self.minimpact, self.maximpact))
+		self.speed = self.minimpact + self.drunkness / denom 
+
+		if self.health > 0:
+			self.health -= 1
+
+		if self.drunkness > self.mindrunk:
+			self.drunkness = self.drunkness - 1
+
+		if self.stoneness > self.minstone:
+			self.stoneness = self.stoneness - 1
+
+
+	def smoke(self):
+
+		if not self.smoking and self.weed > 0 and self.stoneness <= self.maxstone:
+			self.smoking   = True
+			self.speed     = 0
+			self.weed      = self.weed - 1
+			self.stoneness = self.stoneness + STONENESS_INCR
+
+			if self.stoneness > self.maxstone:
+				self.stoneness = self.maxstone
+
+			if self.health < 100:
+				self.health = self.health + 1
+
+			self.image, self.rect = rot_image(self)
+
+
+	def drink(self):
+
+		if not self.drinking and self.beer > 0 and self.drunkness <= self.maxdrunk:
+			self.drinking  = True
+			self.speed     = 0
+			self.beer      = self.beer - 1
+			self.drunkness = self.drunkness + DRUNKNESS_INCR
+
+			if self.drunkness > self.maxdrunk:
+				self.drunkness = self.maxdrunk
+
+			self.image, self.rect = rot_image(self)
+
+
+	def timer(self):
+
+		if self.coin > 0 and self.timeleft < COUNTDOWN_FULL:
+			self.coin     = self.coin - 1
+			self.timeleft = self.timeleft + COUNTDOWN_EXTEND
+
+			if self.timeleft > COUNTDOWN_FULL:
+				self.timeleft = COUNTDOWN_FULL
+
+
 	def update(self, cam_x, cam_y):
 		self.x = self.x + self.speed * math.cos(math.radians(270-self.dir))
 		self.y = self.y + self.speed * math.sin(math.radians(270-self.dir))
+
+
+		if self.timeleft > 0:
+			self.timeleft = self.timeleft - 1
+
+
+		if self.drunkness > self.mindrunk:
+			self.drunkness = round(self.drunkness - .01, 2)
+
+
+		if self.stoneness > self.minstone:
+			self.stoneness = round(self.stoneness - .01, 2)
