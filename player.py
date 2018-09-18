@@ -22,6 +22,12 @@ GRASS_GREEN = 75
 COUNTDOWN_FULL = 3600
 COUNTDOWN_EXTEND = 750
 
+STONENESS_INCR = 10
+STONENESS_DECR = 1
+
+DRUNKNESS_INCR = 10
+DRUNKNESS_DECR = 1
+
 
 def rot_image(player):
 	""" Rotate Player - 
@@ -154,14 +160,20 @@ class Player(pygame.sprite.Sprite):
 		self.deacceleration = 0.7
 		self.softening      = 0.3
 		self.steering       = 10.00
-		self.impact         = -(self.maxspeed * 2)
+		self.maximpact      = 10
+		self.minimpact      = -10
 
 		self.health         = 100
 		self.smoking        = False
 		self.drinking       = False
 
-		self.drunkness      = 0.0
-		self.stoneness      = 0.0
+		self.maxdrunk       = 100
+		self.mindrunk       = 0
+		self.maxstone       = 100
+		self.minstone       = 0
+
+		self.drunkness      = 0
+		self.stoneness      = 0
 
 		self.coin           = 0
 		self.beer           = 0
@@ -244,21 +256,29 @@ class Player(pygame.sprite.Sprite):
 
 	def smacked(self):
 
-		if not self.drunkness > 0.0:
-			if self.speed > 0:
-				self.speed = self.speed + self.impact
+		denom = len(xrange(self.mindrunk, self.maxdrunk)) / len(xrange(self.minimpact, self.maximpact))
+		self.speed = self.minimpact + self.drunkness / denom 
 
-			if self.health > 0:
-				self.health -= 1
+		if self.health > 0:
+			self.health -= 1
+
+		if self.drunkness > self.mindrunk:
+			self.drunkness = self.drunkness - 1
+
+		if self.stoneness > self.minstone:
+			self.stoneness = self.stoneness - 1
 
 
 	def smoke(self):
 
-		if not self.smoking and self.weed > 0 and self.stoneness <= 100:
+		if not self.smoking and self.weed > 0 and self.stoneness <= self.maxstone:
 			self.smoking   = True
 			self.speed     = 0
 			self.weed      = self.weed - 1
-			self.stoneness = self.stoneness + 1
+			self.stoneness = self.stoneness + STONENESS_INCR
+
+			if self.stoneness > self.maxstone:
+				self.stoneness = self.maxstone
 
 			if self.health < 100:
 				self.health = self.health + 1
@@ -268,11 +288,14 @@ class Player(pygame.sprite.Sprite):
 
 	def drink(self):
 
-		if not self.drinking and self.beer > 0 and self.drunkness <= 100:
+		if not self.drinking and self.beer > 0 and self.drunkness <= self.maxdrunk:
 			self.drinking  = True
 			self.speed     = 0
 			self.beer      = self.beer - 1
-			self.drunkness = self.drunkness + 1
+			self.drunkness = self.drunkness + DRUNKNESS_INCR
+
+			if self.drunkness > self.maxdrunk:
+				self.drunkness = self.maxdrunk
 
 			self.image, self.rect = rot_image(self)
 
@@ -296,9 +319,9 @@ class Player(pygame.sprite.Sprite):
 			self.timeleft = self.timeleft - 1
 
 
-		if self.drunkness > 0.0:
-			self.drunkness = round(self.drunkness - 0.001, 3)
+		if self.drunkness > self.mindrunk:
+			self.drunkness = round(self.drunkness - .01, 2)
 
 
-		if self.stoneness > 0.0:
-			self.stoneness = round(self.stoneness - 0.001, 3)
+		if self.stoneness > self.minstone:
+			self.stoneness = round(self.stoneness - .01, 2)
