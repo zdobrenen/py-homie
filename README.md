@@ -1,4 +1,4 @@
-# BudWatch - The Game
+# Simple PyGame Example
 
 
 ## Installation:
@@ -17,9 +17,3 @@ python main.py
 
 
 Move player with the arrow keys.
-
-Collect weed and smoke it w/ S_key to regain health
-
-Collect beer and drink it w/ D_key to nagate car impact
-
-Collect coin and use it w/ T_key to regain time
